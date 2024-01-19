@@ -1,39 +1,49 @@
-# cfbot
+# qq机器人的安装使用说明
 
-#### 介绍
-{**以下是 Gitee 平台说明，您可以替换此简介**
-Gitee 是 OSCHINA 推出的基于 Git 的代码托管平台（同时支持 SVN）。专为开发者提供稳定、高效、安全的云端软件开发协作平台
-无论是个人、团队、或是企业，都能够用 Gitee 实现代码托管、项目管理、协作开发。企业项目请看 [https://gitee.com/enterprises](https://gitee.com/enterprises)}
+## qq机器人的安装
 
-#### 软件架构
-软件架构说明
+1.去go-cqhttp官网下载qq机器人
 
+[Tags · Mrs4s/go-cqhttp (github.com)](https://github.com/Mrs4s/go-cqhttp/tags)
 
-#### 安装教程
+2.找到想要的版本，点击进入后下载系统可以使用的安装包（此文件说明时使用的V1.2.0）
 
-1.  xxxx
-2.  xxxx
-3.  xxxx
+3.以window为例，运行`.exe`文件，一路确定，会出现.bat文件
 
-#### 使用说明
+4.运行.bat文件，选择`0 http`通信就可以
 
-1.  xxxx
-2.  xxxx
-3.  xxxx
+5.修改配置文件`config.yml`，内容如下 **请务必将qq号改为自己的**
 
-#### 参与贡献
+链接：https://pan.baidu.com/s/1Oz96-GQnxc_eEU6BMo8nlg?pwd=ldcf 
+提取码：ldcf
 
-1.  Fork 本仓库
-2.  新建 Feat_xxx 分支
-3.  提交代码
-4.  新建 Pull Request
+6.再次运行`.bat`文件，会生成`device.json`
 
+7.修改`json`文件，修改这一部分为 2`"protocol":2`  （这是将协议改为手表，是最好实现的一种办法）
 
-#### 特技
+## python代码的下载与使用
 
-1.  使用 Readme\_XXX.md 来支持不同的语言，例如 Readme\_en.md, Readme\_zh.md
-2.  Gitee 官方博客 [blog.gitee.com](https://blog.gitee.com)
-3.  你可以 [https://gitee.com/explore](https://gitee.com/explore) 这个地址来了解 Gitee 上的优秀开源项目
-4.  [GVP](https://gitee.com/gvp) 全称是 Gitee 最有价值开源项目，是综合评定出的优秀开源项目
-5.  Gitee 官方提供的使用手册 [https://gitee.com/help](https://gitee.com/help)
-6.  Gitee 封面人物是一档用来展示 Gitee 会员风采的栏目 [https://gitee.com/gitee-stars/](https://gitee.com/gitee-stars/)
+1.将python代码下载之后，运行`main.py`文件
+
+2.根据报错，安装python的相关库
+
+3.正常运行后关闭即可
+
+## 运行过程
+
+1.首先运行go-cqhttp机器人，即运行`.bat`文件，等待二维码扫码登陆
+
+2.运行`main.py`，即可正常使用
+
+# 开发说明
+
+如果想要开发自动发送图片的功能，可以参考`method.py`文件
+
+```python
+def sendGroupyq(uid):
+    requests.get(
+        url='http://127.0.0.1:5700/send_group_msg?group_id={0}&message={1}'.format(uid, '文件名.后缀'))
+```
+
+#### 图片文件放到机器人文件中的/data/images文件中
+
