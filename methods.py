@@ -1,4 +1,5 @@
 import time
+import datetime
 from time import sleep
 import requests
 from requests.adapters import HTTPAdapter
@@ -131,7 +132,7 @@ def sendPrivateNowCoderContests(uid,nickname):
 
 def sendGroupNowCoderContests(group_id,uid,nickname):
     contests = get_nowcoder_contests()
-    print(contests)
+    # print(contests)
     message = "《牛客比赛日历》\n"
     for x in contests:
         contest_time = list(map(str, x['contest_time']))
@@ -140,6 +141,93 @@ def sendGroupNowCoderContests(group_id,uid,nickname):
     now_time = datetime.now()
     now_time = datetime.strftime(now_time, '%Y-%m-%d %H:%M:%S')
     message = message + "更新时间 : " + now_time
+    data = {
+        "group_id": group_id,
+        "message": message
+    }
+    requests.post(url=url_reboot + "/send_group_msg", json=data)
+
+"""
+自动发送今天的比赛信息
+包括codeforces，atcoder,牛客
+"""
+def autosendmessage(group_id):
+    todaydate = datetime.now().strftime('%Y-%m-%d')
+    response = RES.get(url=url_cf + "/contest.list")
+    while response.status_code != 200:
+        response = RES.get(url=url_cf + "/contest.list")
+        sleep(0.3)
+    res = response.json().get("result")
+    contests = []
+    for i in res:
+        if i.get("phase") == "FINISHED":
+            break
+        contest = {
+            "name": i.get("name"),
+            "begin_time": formatDate(i.get("startTimeSeconds")),
+            "end_time": formatDate(i.get("startTimeSeconds") + i.get("durationSeconds")),
+            "type": i.get("type"),
+            "status": i.get("phase"),
+            "relative_time": i.get("relativeTimeSeconds"),
+            "id": i.get("id"),
+        }
+        reset = abs(i.get("relativeTimeSeconds"))
+        if reset > 7 * 24 * 60 * 60:
+            continue
+        contests.append(contest)
+    if len(contests) != 0:
+        a = contests[-1]
+        timet = a['begin_time'].split()
+        cftime = timet[0]
+        message = "今日比赛\n"
+        if cftime == todaydate:
+            message += "codeforces:\n"
+            for i in contests[::-1]:
+                timet = i['begin_time'].split()
+                if timet[0] != cftime:
+                    break
+                message += " 	比赛名称 : " + i["name"] + "     \n" \
+                           + " 	比赛链接： https://codeforces.com/contestRegistration/" + str(i["id"]) + "     \t\n" \
+                           + " 	开始时间 : " + i["begin_time"] + "     \t\n" \
+                           + " 	结束时间 : " + i["end_time"] + "     \t\n" \
+                           + " 	比赛类型 : " + i["type"] + "     \t\n"
+                if i["status"] != "BEFORE":
+                    message += " 	比赛状态 : 进行中...\t\n\n"
+                else:
+                    message += " 	比赛状态 : 未开始，距开始剩余 " + formatSeconds(abs(i["relative_time"])) + "\t\n\n"
+    # atcoder
+    contests = get_atcoder_contests()
+    if len(contests) != 0:
+        x = contests[0]
+        contest_time = list(map(str, x['contest_time']))
+        timet = contest_time[0].split()
+        attime = timet[0]
+        if attime == todaydate:
+            message += "atcoder：\n"
+            for x in contests:
+                contest_time = list(map(str, x['contest_time']))
+                timet = contest_time[0].split()
+                if timet[0] != attime:
+                    break
+                message = message + " 	比赛名字：\t" + x['name'] + "\n" + " 	比赛链接：\t" + x[
+                    'link'] + "\n" + " 	开始时间：\t" + contest_time[0] + "\n结束时间：" + contest_time[1] + "\n\n"
+    # 牛客
+    contests = get_nowcoder_contests()
+    if len(contests) != 0:
+        x = contests[0]
+        contest_time = list(map(str, x['contest_time']))
+        timet = contest_time[0].split()
+        nktime = timet[0]
+        if nktime == todaydate:
+            message += "牛客：\n"
+            for x in contests:
+                contest_time = list(map(str, x['contest_time']))
+                timet = contest_time[0].split()
+                if timet[0] != nktime:
+                    break
+                message = message + " 	比赛名字：\t" + x['name'] + "\n" + " 	比赛链接：\t" + x[
+                    'link'] + "\n" + " 	开始时间：\t" + \
+                          contest_time[0] + "\n结束时间：" + contest_time[1] + "\n\n"
     data = {
         "group_id": group_id,
         "message": message

@@ -1,13 +1,22 @@
+import time
+
 from flask import Flask, request
 from methods import sendPrivateContests, sendGroupContests,\
-    sendGroupAtcoderContests,sendGroupNowCoderContests,sendPrivateNowCoderContests,sendPrivateAtcoderContests
+    sendGroupAtcoderContests,sendGroupNowCoderContests,sendPrivateNowCoderContests,sendPrivateAtcoderContests,autosendmessage
 
 app = Flask(__name__)
 
 qqnumber = "3392562158" #填写登陆qq号的账号，以便后期@使用，防止消息误触
+autonumber = "722401553"
 
 @app.route('/', methods=["POST"])
 def post_data():
+
+    timenow = time.strftime("%H:%M",time.localtime())
+    if timenow == "17:05":
+        print("jin")
+        autosendmessage(autonumber)
+        time.sleep(61)
     if request.get_json().get("message_type") == "private":  # 如果是私聊信息
         uid = request.get_json().get('sender').get('user_id')  # 获取信息发送者的 QQ号码
         nickname = request.get_json().get("sender").get("nickname")
@@ -27,14 +36,15 @@ def post_data():
         uid = request.get_json().get('sender').get('user_id')  # 获取信息发送者的 QQ号码
         nickname = request.get_json().get("sender").get("nickname")
         message = request.get_json().get('raw_message')  # 获取原始信息
+        print(uid,nickname,message)
         if "[CQ:at,qq="+qqnumber+"]" in message:
-            if message == "atcoder -c" or message == "at -c":
+            if "atcoder -c" in message or "at -c" in message:
                 print(uid, nickname, message)
                 sendGroupAtcoderContests(gid,uid,nickname)
-            if message == "nowcoder -c" or message == "nk -c":
+            if "nowcoder -c" in message or "nk -c" in message:
                 print(uid, nickname, message)
                 sendGroupNowCoderContests(gid,uid,nickname)
-            if message == "cf -c" or message == "cf contests":
+            if "cf -c" in message or "cf contests" in message:
                 print(uid, nickname, message)
                 sendGroupContests(gid, nickname,uid)
     return "OK"
