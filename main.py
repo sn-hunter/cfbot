@@ -28,13 +28,13 @@ def post_data():
         nickname = request.get_json().get("sender").get("nickname")
         message = request.get_json().get('raw_message')  # 获取原始信息
         if "[CQ:at,qq="+qqnumber+"]" in message:
-            if message == "atcoder -c" or message == "at -c":
+            if "atcoder -c" in message or "at -c" in message:
                 print(uid, nickname, message)
                 sendGroupAtcoderContests(gid,uid,nickname)
-            if message == "nowcoder -c" or message == "nk -c":
+            if "nowcoder -c" in message or "nk -c" in message:
                 print(uid, nickname, message)
                 sendGroupNowCoderContests(gid,uid,nickname)
-            if message == "cf -c" or message == "cf contests":
+            if "cf -c" in message or "cf contests" in message:
                 print(uid, nickname, message)
                 sendGroupContests(gid, nickname,uid)
     return "OK"
